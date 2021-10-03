@@ -1,0 +1,2 @@
+# Conway's Game of Life
+Rust implementation of the Conway's Game of Life for fun and learning by a complete newby. The specs are based on the Wikipedia article on [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life).
