@@ -10,11 +10,11 @@ fn main() {
         return;
     }
 
-    let height = &args[1].parse::<u32>().unwrap();
-    let width = &args[2].parse::<u32>().unwrap();
-    let init_cells: Vec<(u32, u32)> = args[3].split(',')
+    let height = &args[1].parse::<usize>().unwrap();
+    let width = &args[2].parse::<usize>().unwrap();
+    let init_cells: Vec<(usize, usize)> = args[3].split(',')
         .map(|v| {
-            let coords: Vec<u32> = v.split('-').map(|iv| iv.parse::<u32>().unwrap()).collect();
+            let coords: Vec<usize> = v.split('-').map(|iv| iv.parse::<usize>().unwrap()).collect();
 
             (coords[0], coords[1])
         }).collect();
@@ -39,15 +39,14 @@ fn out_help() {
     println!("cnys_game_of_life <height::i32> <width::i32> <comma separated coordinates of alive cells like: <latitude>-<longitude>,<latitude>-<longitude>>");
 }
 
-fn out_state(height: &u32, width: &u32, cells: &Vec<(u32, u32)>) {
-    let line_length: usize = *width as usize;
-    let mut grid = vec![vec![false; *height as usize]; *width as usize];
+fn out_state(height: &usize, width: &usize, cells: &Vec<(usize, usize)>) {
+    let mut grid = vec![vec![false; *height]; *width];
 
     for (x, y) in cells.iter() {
-        grid[(x - 1) as usize][(y - 1) as usize] = true;
+        grid[x - 1][y - 1] = true;
     }
     
-    out_header_line(&line_length);
+    out_header_line(&width);
 
     for row in grid.iter().rev() {
         let row_cells: Vec<&str> = row.iter().map(|c| match c {
@@ -56,7 +55,7 @@ fn out_state(height: &u32, width: &u32, cells: &Vec<(u32, u32)>) {
         }).collect();
 
         println!("|{}|", row_cells.join("|"));
-        out_header_line(&line_length);
+        out_header_line(&width);
     }
 }
 

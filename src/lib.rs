@@ -1,18 +1,18 @@
 pub mod game {
-    pub fn play(height: &u32, width: &u32, cells: &Vec<(u32, u32)>) -> Vec<(u32, u32)> {
-        let mut grid = vec![vec![false; *height as usize]; *width as usize];
+    pub fn play(height: &usize, width: &usize, cells: &Vec<(usize, usize)>) -> Vec<(usize, usize)> {
+        let mut grid = vec![vec![false; *height]; *width];
 
         for (x, y) in cells.iter() {
-            grid[(x - 1) as usize][(y - 1) as usize] = true;
+            grid[x - 1][y - 1] = true;
         }
 
-        let mut next: Vec<(u32, u32)> = vec![];
+        let mut next: Vec<(usize, usize)> = vec![];
 
         for (x, col) in grid.iter().enumerate() {
             for (y, cell_status) in col.iter().enumerate() {
                 match scan(cell_status, &x, &y, &grid) {
-                    State::Alive => next.push((x as u32, y as u32)),
-                    State::Reproduction => next.push((x as u32, y as u32)),
+                    State::Alive => next.push((x, y)),
+                    State::Reproduction => next.push((x, y)),
                     _ => ()
                 };
             }
@@ -23,8 +23,16 @@ pub mod game {
 
     fn scan(is_alive: &bool, x: &usize, y: &usize, grid: &Vec<Vec<bool>>) -> State {
         let scan_range = 2;
-        let s_x = x - 2;
-        let s_y = y - 2;
+        let s_x = if 2 > *x {
+            0
+        } else {
+            x - 2
+        };
+        let s_y = if 2 > *y {
+            0
+        } else {
+            y - 2
+        };
         let mut alive_neighbours = 0;
 
         for i_x in s_x..(s_x + scan_range) {
