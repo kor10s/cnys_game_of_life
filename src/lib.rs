@@ -1,4 +1,6 @@
 pub mod game {
+    use std::fmt;
+
     pub fn play(height: &usize, width: &usize, cells: &Vec<(usize, usize)>) -> Vec<(usize, usize)> {
         let mut grid = vec![vec![false; *height]; *width];
 
@@ -22,7 +24,7 @@ pub mod game {
     }
 
     fn scan(is_alive: &bool, x: &usize, y: &usize, grid: &Vec<Vec<bool>>) -> State {
-        let scan_range = 2;
+        let scan_range = 3;
         let s_x = if 2 > *x {
             0
         } else {
@@ -56,11 +58,103 @@ pub mod game {
         }
     }
 
+    #[derive(Debug, PartialEq)]
     enum State {
         Alive,
         Dead,
         Underpopulation,
         Overpopulation,
         Reproduction
+    }
+
+    impl fmt::Display for State {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            match *self {
+                State::Alive => write!(f, "Alive"),
+                State::Dead => write!(f, "Dead"),
+                State::Underpopulation => write!(f, "Underpopulation"),
+                State::Overpopulation => write!(f, "Overpopulation"),
+                State::Reproduction => write!(f, "Reproduction")
+            }
+        }
+    }
+
+    #[cfg(test)]
+    mod scan_should {
+        use super::*;
+
+        #[test]
+        fn find_underpopulation() {
+            let cell_x = 1usize;
+            let cell_y = 1usize;
+
+            let mut grid = vec![vec![false; 5]; 5];
+            grid[cell_x - 1][cell_y - 1] = true;
+            grid[1][1] = true;
+
+            let state = scan(&true, &cell_x, &cell_y, &grid);
+
+            assert_eq!(state, State::Underpopulation, "State [{}] was expected to be [{}]", state, State::Underpopulation);
+        }
+
+        #[test]
+        fn find_alive() {
+            let cell_x = 1usize;
+            let cell_y = 1usize;
+
+            let mut grid = vec![vec![false; 5]; 5];
+            grid[cell_x - 1][cell_y - 1] = true;
+            grid[0][1] = true;
+            grid[1][1] = true;
+            grid[1][0] = true;
+
+            let state = scan(&true, &cell_x, &cell_y, &grid);
+
+            assert_eq!(state, State::Alive, "State [{}] was expected to be [{}]", state, State::Alive);
+        }
+
+        #[test]
+        fn find_overpopulation() {
+            let cell_x = 2usize;
+            let cell_y = 2usize;
+
+            let mut grid = vec![vec![false; 5]; 5];
+            grid[cell_x - 1][cell_y - 1] = true;
+            grid[0][0] = true;
+            grid[1][0] = true;
+            grid[2][0] = true;
+            grid[2][1] = true;
+
+            let state = scan(&true, &cell_x, &cell_y, &grid);
+
+            assert_eq!(state, State::Overpopulation, "State [{}] was expected to be [{}]", state, State::Overpopulation);
+        }
+
+        #[test]
+        fn find_reproduction() {
+            let cell_x = 1usize;
+            let cell_y = 1usize;
+
+            let mut grid = vec![vec![false; 5]; 5];
+            grid[1][2] = true;
+            grid[2][2] = true;
+            grid[2][1] = true;
+
+            let state = scan(&false, &cell_x, &cell_y, &grid);
+
+            assert_eq!(state, State::Reproduction, "State [{}] was expected to be [{}]", state, State::Reproduction);
+        }
+
+        #[test]
+        fn find_dead() {
+            let cell_x = 1usize;
+            let cell_y = 1usize;
+
+            let grid = vec![vec![false; 5]; 5];
+
+            let state = scan(&false, &cell_x, &cell_y, &grid);
+
+            assert_eq!(state, State::Dead, "State [{}] was expected to be [{}]", state, State::Dead);
+        }
     }
 }
