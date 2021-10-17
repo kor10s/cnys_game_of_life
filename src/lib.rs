@@ -13,8 +13,8 @@ pub mod game {
         for (x, col) in grid.iter().enumerate() {
             for (y, cell_status) in col.iter().enumerate() {
                 match scan(cell_status, &x, &y, &grid) {
-                    State::Alive => next.push((x, y)),
-                    State::Reproduction => next.push((x, y)),
+                    State::Alive => next.push((x + 1, y + 1)),
+                    State::Reproduction => next.push((x + 1, y + 1)),
                     _ => ()
                 };
             }
@@ -155,6 +155,32 @@ pub mod game {
             let state = scan(&false, &cell_x, &cell_y, &grid);
 
             assert_eq!(state, State::Dead, "State [{}] was expected to be [{}]", state, State::Dead);
+        }
+    }
+
+    #[cfg(test)]
+    mod play_should {
+        use super::*;
+        use std::collections::HashSet;
+
+        #[test]
+        fn exec_blinker() {
+            let height = 5usize;
+            let width = 5usize;
+            let initial_state: Vec<(usize, usize)> = vec![(3, 2), (3, 3), (3, 4)];
+            let expect_state_1: Vec<(usize, usize)> = vec![(2, 3), (3, 3), (4, 3)];
+            let expect_state_2: Vec<(usize, usize)> = vec![(3, 2), (3, 3), (3, 4)];
+
+            let state_1 = play(&height, &width, &initial_state);
+            let state_2 = play(&height, &width, &state_1);
+
+            assert!(equal_anyorder(&state_1, &expect_state_1), "Expected state after the first tick was {:?} but got {:?}", expect_state_1, state_1);
+            assert!(equal_anyorder(&state_2, &expect_state_2), "Expected state after the first tick was {:?} but got {:?}", expect_state_2, state_2);
+        }
+
+        fn equal_anyorder(i1: &Vec<(usize, usize)>, i2: &Vec<(usize, usize)>) -> bool {
+            let set:HashSet<(usize, usize)> = i2.iter().cloned().collect();
+            i1.iter().all(|x| set.contains(&x))
         }
     }
 }
