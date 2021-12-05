@@ -24,21 +24,30 @@ pub mod game {
     }
 
     fn scan(is_alive: &bool, x: &usize, y: &usize, grid: &Vec<Vec<bool>>) -> State {
-        let scan_range = 3;
-        let s_x = if 2 > *x {
-            0
+        let s_x = if 1 > *x {
+            *x
         } else {
-            x - 2
+            *x - 1
         };
-        let s_y = if 2 > *y {
-            0
+        let s_y = if 1 > *y {
+            *y
         } else {
-            y - 2
+            *y - 1
+        };
+        let f_x = if x + 1 >= grid.len() {
+            *x + 1
+        } else {
+            *x + 2
+        };
+        let f_y = if y + 1 >= grid[0].len() {
+            *y + 1
+        } else {
+            *y + 2
         };
         let mut alive_neighbours = 0;
 
-        for i_x in s_x..(s_x + scan_range) {
-            for i_y in s_y..(s_y + scan_range) {
+        for i_x in s_x..f_x {
+            for i_y in s_y..f_y {
                 if (i_x != *x || i_y != *y) && grid[i_x][i_y] {
                     alive_neighbours += 1;
                 }
@@ -115,11 +124,11 @@ pub mod game {
 
         #[test]
         fn find_overpopulation() {
-            let cell_x = 2usize;
-            let cell_y = 2usize;
+            let cell_x = 1usize;
+            let cell_y = 1usize;
 
             let mut grid = vec![vec![false; 5]; 5];
-            grid[cell_x - 1][cell_y - 1] = true;
+            grid[cell_x][cell_y] = true;
             grid[0][0] = true;
             grid[1][0] = true;
             grid[2][0] = true;
